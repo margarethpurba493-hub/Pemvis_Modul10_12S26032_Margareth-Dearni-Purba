@@ -1,0 +1,224 @@
+<?xml version="1.0"?>
+<flowgorithm fileversion="4.2">
+    <attributes>
+        <attribute name="name" value="Soal_03_PustakaAnalisisArrayStatistik"/>
+        <attribute name="authors" value="marga"/>
+        <attribute name="about" value=""/>
+        <attribute name="saved" value="2026-11-15 12:38:42 AM"/>
+        <attribute name="created" value="bWFyZ2E7TUFSR0FSRVRIOzIwMjYtMTEtMTU7MTI6MDU6MTcgQU07MjQ1MA=="/>
+        <attribute name="edited" value="bWFyZ2E7TUFSR0FSRVRIOzIwMjYtMTEtMTU7MTI6MjU6NDYgQU07MTA7TWFoYXNpc3dhO1BDOzIwMjYtMTEtMTM7MTA6MDA6MDAgQU07U29hbF8wM19QdXN0YWthQW5hbGlzaXNBcnJheVN0YXRpc3Rpay5mcHJnOzkyMzI="/>
+        <attribute name="edited" value="bWFyZ2E7TUFSR0FSRVRIOzIwMjYtMTEtMTU7MTI6Mzg6NDIgQU07MTsyNTYy"/>
+    </attributes>
+    <function name="Main" type="None" variable="">
+        <parameters/>
+        <body>
+            <declare name="n, jumlahPencilan" type="Integer" array="False" size=""/>
+            <declare name="rata, simpangan, nilaiMin, nilaiMaks, nilai" type="Real" array="False" size=""/>
+            <assign variable="n" expression="bacaIntegerMin(&quot;masukkan jumlah peserta n (minimal 3):&quot;, 3)"/>
+            <declare name="skor" type="Real" array="True" size="n"/>
+            <call expression="inputSkorPeserta(skor, n)"/>
+            <call expression="tampilkanArray(skor, n, &quot;Skor SEBELUM normalisasi&quot;)"/>
+            <assign variable="rata" expression="hitungRataRata(skor, n)"/>
+            <assign variable="simpangan" expression="hitungStandarDeviasi(skor, n, rata)"/>
+            <output expression="&quot;rata-rata (mean) : &quot; &amp; bulatDua(rata)" newline="True"/>
+            <output expression="&quot;standar deviasi (SD) : &quot; &amp; bulatDua(simpangan)" newline="True"/>
+            <assign variable="jumlahPencilan" expression="hitungCacahPencilan(skor, n, rata, simpangan)"/>
+            <output expression="&quot;total pencilan terdeteksi: &quot; &amp; jumlahPencilan" newline="True"/>
+            <assign variable="nilaiMin" expression="cariMinimum(skor, n)"/>
+            <assign variable="nilaiMaks" expression="cariMaksimum(skor, n)"/>
+            <output expression="&quot;skor minimum: &quot; &amp; bulatDua(nilaiMin) &amp; &quot;skor maksimum: &quot; &amp; bulatDua(nilaiMaks)" newline="True"/>
+            <call expression="normalisasiMinMax(skor, n, nilaiMin, nilaiMaks)"/>
+            <call expression="tampilkanArray(skor, n, &quot;Skor SESUDAH normalisasi (skala 0-100)&quot;)"/>
+        </body>
+    </function>
+    <function name="bacaIntegerMin" type="Integer" variable="nilai">
+        <parameters>
+            <parameter name="pesan" type="String" array="False"/>
+            <parameter name="batasMin" type="Integer" array="False"/>
+        </parameters>
+        <body>
+            <declare name="nilai" type="Integer" array="False" size=""/>
+            <do expression="nilai &lt; batasMin">
+                <output expression="pesan" newline="True"/>
+                <input variable="nilai"/>
+                <if expression="nilai &lt; batasMin">
+                    <then>
+                        <output expression="&quot;[ERROR] Nilai minimal adalah &quot; &amp; batasMin &amp; &quot;!&quot;" newline="True"/>
+                    </then>
+                    <else/>
+                </if>
+            </do>
+        </body>
+    </function>
+    <function name="bulatDua" type="Real" variable="hasil">
+        <parameters>
+            <parameter name="nilai" type="Real" array="False"/>
+        </parameters>
+        <body>
+            <declare name="hasil" type="Real" array="False" size=""/>
+            <assign variable="hasil" expression="Int(nilai*100)/100"/>
+        </body>
+    </function>
+    <function name="cariMaksimum" type="Real" variable="hasil">
+        <parameters>
+            <parameter name="arr" type="Real" array="True"/>
+            <parameter name="n" type="Integer" array="False"/>
+        </parameters>
+        <body>
+            <declare name="hasil" type="Real" array="False" size=""/>
+            <declare name="i" type="Integer" array="False" size=""/>
+            <assign variable="hasil" expression="arr[0]"/>
+            <for variable="i" start="1" end="n - 1" direction="inc" step="1">
+                <if expression="arr[i] &gt; hasil">
+                    <then>
+                        <assign variable="hasil" expression="arr[i]"/>
+                    </then>
+                    <else/>
+                </if>
+            </for>
+        </body>
+    </function>
+    <function name="cariMinimum" type="Real" variable="hasil">
+        <parameters>
+            <parameter name="arr" type="Real" array="True"/>
+            <parameter name="n" type="Integer" array="False"/>
+        </parameters>
+        <body>
+            <declare name="hasil" type="Real" array="False" size=""/>
+            <declare name="i" type="Integer" array="False" size=""/>
+            <assign variable="hasil" expression="arr[0]"/>
+            <for variable="i" start="1" end="n - 1" direction="inc" step="1">
+                <if expression="arr[i] &lt; hasil">
+                    <then>
+                        <assign variable="hasil" expression="arr[i]"/>
+                    </then>
+                    <else/>
+                </if>
+            </for>
+        </body>
+    </function>
+    <function name="hitungCacahPencilan" type="Integer" variable="cacah">
+        <parameters>
+            <parameter name="arr" type="Real" array="True"/>
+            <parameter name="n" type="Integer" array="False"/>
+            <parameter name="mean" type="Real" array="False"/>
+            <parameter name="stdDev" type="Real" array="False"/>
+        </parameters>
+        <body>
+            <declare name="cacah" type="Integer" array="False" size=""/>
+            <declare name="i" type="Integer" array="False" size=""/>
+            <declare name="batasBawah, batasAtas" type="Real" array="False" size=""/>
+            <assign variable="cacah" expression="0"/>
+            <assign variable="batasBawah" expression="mean - 1.5 * stdDev"/>
+            <assign variable="batasAtas" expression="mean + 1.5 * stdDev"/>
+            <output expression="&quot;deteksi pencilan (di luar &quot; &amp; bulatDua(batasBawah) &amp; &quot; s.d. &quot; &amp; bulatDua(batasAtas) &amp; &quot;):&quot;" newline="True"/>
+            <for variable="i" start="0" end="n - 1" direction="inc" step="1">
+                <if expression="arr[i] &lt; batasBawah or arr[i] &gt; batasAtas">
+                    <then>
+                        <output expression="&quot;  PENCILAN : Peserta ke-&quot; &amp; (i + 1) &amp; &quot; skor &quot; &amp; bulatDua(arr[i])" newline="True"/>
+                        <assign variable="cacah" expression="cacah + 1"/>
+                    </then>
+                    <else/>
+                </if>
+            </for>
+            <if expression="cacah == 0">
+                <then>
+                    <output expression="&quot; tidak ada pencilan.&quot;" newline="True"/>
+                </then>
+                <else/>
+            </if>
+        </body>
+    </function>
+    <function name="hitungRataRata" type="Real" variable="hasil">
+        <parameters>
+            <parameter name="arr" type="Real" array="True"/>
+            <parameter name="n" type="Integer" array="False"/>
+        </parameters>
+        <body>
+            <declare name="hasil" type="Real" array="False" size=""/>
+            <declare name="i" type="Integer" array="False" size=""/>
+            <declare name="total" type="Real" array="False" size=""/>
+            <assign variable="total" expression="0"/>
+            <for variable="i" start="0" end="n - 1" direction="inc" step="1">
+                <assign variable="total" expression="total + arr[i]"/>
+            </for>
+            <assign variable="hasil" expression="total / n"/>
+        </body>
+    </function>
+    <function name="hitungStandarDeviasi" type="Real" variable="hasil">
+        <parameters>
+            <parameter name="arr" type="Real" array="True"/>
+            <parameter name="n" type="Integer" array="False"/>
+            <parameter name="mean" type="Real" array="False"/>
+        </parameters>
+        <body>
+            <declare name="hasil" type="Real" array="False" size=""/>
+            <declare name="i" type="Integer" array="False" size=""/>
+            <declare name="total" type="Real" array="False" size=""/>
+            <assign variable="total" expression="0"/>
+            <for variable="i" start="0" end="n - 1" direction="inc" step="1">
+                <assign variable="total" expression="total + (arr[i] - mean) * (arr[i] - mean)"/>
+            </for>
+            <assign variable="hasil" expression="Sqrt(total / n)"/>
+        </body>
+    </function>
+    <function name="inputSkorPeserta" type="None" variable="">
+        <parameters>
+            <parameter name="arr" type="Real" array="True"/>
+            <parameter name="n" type="Integer" array="False"/>
+        </parameters>
+        <body>
+            <declare name="i" type="Integer" array="False" size=""/>
+            <for variable="i" start="0" end="n - 1" direction="inc" step="1">
+                <do expression="arr[i] &lt; 0 or arr[i] &gt; 1000">
+                    <output expression="&quot;skor peserta ke-&quot; &amp; (i + 1) &amp; &quot; [0 - 1000]:&quot;" newline="True"/>
+                    <input variable="arr[i]"/>
+                    <if expression="arr[i] &lt; 0 or arr[i] &gt; 1000">
+                        <then>
+                            <output expression="&quot;error, skor harus di rentang 0.0 s.d. 1000!&quot;" newline="True"/>
+                        </then>
+                        <else/>
+                    </if>
+                </do>
+            </for>
+        </body>
+    </function>
+    <function name="normalisasiMinMax" type="None" variable="">
+        <parameters>
+            <parameter name="arr" type="Real" array="True"/>
+            <parameter name="n" type="Integer" array="False"/>
+            <parameter name="nilaiMin" type="Real" array="False"/>
+            <parameter name="nilaiMaks" type="Real" array="False"/>
+        </parameters>
+        <body>
+            <declare name="i" type="Integer" array="False" size=""/>
+            <if expression="nilaiMaks == nilaiMin">
+                <then>
+                    <output expression="&quot;PERINGATAN!,semua skor sama (maks == min). Pembagian nol dicegah, seluruh skor diset 0&quot;" newline="True"/>
+                    <for variable="i" start="0" end="n - 1" direction="inc" step="1">
+                        <assign variable="arr[i]" expression="0"/>
+                    </for>
+                </then>
+                <else>
+                    <for variable="i" start="0" end="n - 1" direction="inc" step="1">
+                        <assign variable="arr[i]" expression="((arr[i] - nilaiMin) / (nilaiMaks - nilaiMin)) * 100"/>
+                    </for>
+                </else>
+            </if>
+        </body>
+    </function>
+    <function name="tampilkanArray" type="None" variable="">
+        <parameters>
+            <parameter name="arr" type="Real" array="True"/>
+            <parameter name="n" type="Integer" array="False"/>
+            <parameter name="judul" type="String" array="False"/>
+        </parameters>
+        <body>
+            <declare name="i" type="Integer" array="False" size=""/>
+            <output expression="judul" newline="True"/>
+            <for variable="i" start="0" end="n - 1" direction="inc" step="1">
+                <output expression="&quot;  peserta &quot; &amp; (i + 1) &amp; &quot; : &quot; &amp; bulatDua(arr[i])" newline="True"/>
+            </for>
+        </body>
+    </function>
+</flowgorithm>

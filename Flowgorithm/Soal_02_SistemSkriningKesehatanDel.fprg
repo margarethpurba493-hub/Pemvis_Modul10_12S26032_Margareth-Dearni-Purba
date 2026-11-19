@@ -1,0 +1,284 @@
+<?xml version="1.0"?>
+<flowgorithm fileversion="4.2">
+    <attributes>
+        <attribute name="name" value="Soal_02_SistemSkriningKesehatanDel"/>
+        <attribute name="authors" value="marga"/>
+        <attribute name="about" value=""/>
+        <attribute name="saved" value="2026-11-15 12:04:54 AM"/>
+        <attribute name="created" value="bWFyZ2E7TUFSR0FSRVRIOzIwMjYtMTEtMTQ7MTE6MDg6NDYgUE07MjQ2OA=="/>
+        <attribute name="edited" value="bWFyZ2E7TUFSR0FSRVRIOzIwMjYtMTEtMTQ7MTE6NTE6MDcgUE07MTI7TWFoYXNpc3dhO1BDOzIwMjYtMTEtMTM7MTA6MDA6MDAgQU07U29hbF8wMl9TaXN0ZW1Ta3JpbmluZ0tlc2VoYXRhbkRlbC5mcHJnOzg4ODE="/>
+        <attribute name="edited" value="bWFyZ2E7TUFSR0FSRVRIOzIwMjYtMTEtMTU7MTI6MDQ6NTQgQU07MTsyNTU4"/>
+    </attributes>
+    <function name="Main" type="None" variable="">
+        <parameters/>
+        <body>
+            <declare name="m, i, sistolik, diastolik, kodeTensi, skor, skorTertinggi, totalSemuaSkor" type="Integer" array="False" size=""/>
+            <declare name="berat, tinggi, gula, bmi" type="Real" array="False" size=""/>
+            <declare name="nama, namaTertinggi, predikat" type="String" array="False" size=""/>
+            <assign variable="m" expression="bacaIntegerMin(&quot;Masukkan jumlah pasien M (minimal 1):&quot;, 1)"/>
+            <assign variable="skorTertinggi" expression="-1"/>
+            <assign variable="totalSemuaSkor" expression="0"/>
+            <assign variable="namaTertinggi" expression="&quot;&quot;"/>
+            <for variable="i" start="1" end="m" direction="inc" step="1">
+                <output expression="&quot;Data Pasien ke-&quot; &amp; i" newline="True"/>
+                <output expression="&quot;nama pasien:&quot;" newline="True"/>
+                <input variable="nama"/>
+                <assign variable="berat" expression="bacaRealRentang(&quot;berat badan (kg) [10-300]:&quot;, 10.0, 300.0)"/>
+                <assign variable="tinggi" expression="bacaRealRentang(&quot;tinggi badan (cm) [50-250]:&quot;, 50.0, 250.0)"/>
+                <assign variable="sistolik" expression="bacaIntegerRentang(&quot;tekanan sistolik (mmHg) [60-300]:&quot;, 60, 300)"/>
+                <assign variable="diastolik" expression="bacaIntegerRentang(&quot;tekanan diastolik (mmHg) [30-200]:&quot;, 30, 200)"/>
+                <assign variable="gula" expression="bacaRealRentang(&quot;gula darah puasa (mg/dL) [20-800]:&quot;, 20.0, 800.0)"/>
+                <assign variable="bmi" expression="hitungBMI(berat, tinggi)"/>
+                <assign variable="kodeTensi" expression="kategoriTekananDarah(sistolik, diastolik)"/>
+                <assign variable="skor" expression="hitungSkorRisikoKomposit(bmi, kodeTensi, gula)"/>
+                <assign variable="predikat" expression="predikatTindakanMedis(skor)"/>
+                <call expression="cetakKartuResume(i, nama, bmi, kodeTensi, gula, skor, predikat)"/>
+                <assign variable="totalSemuaSkor" expression="totalSemuaSkor + skor"/>
+                <if expression="skor &gt; skorTertinggi">
+                    <then>
+                        <assign variable="skorTertinggi" expression="skor"/>
+                        <assign variable="namaTertinggi" expression="nama"/>
+                    </then>
+                    <else/>
+                </if>
+            </for>
+            <call expression="cetakRingkasanKlinik(m, namaTertinggi, skorTertinggi, totalSemuaSkor / m)"/>
+        </body>
+    </function>
+    <function name="bacaIntegerMin" type="Integer" variable="nilai">
+        <parameters>
+            <parameter name="pesan" type="String" array="False"/>
+            <parameter name="batasMin" type="Integer" array="False"/>
+        </parameters>
+        <body>
+            <declare name="nilai" type="Integer" array="False" size=""/>
+            <do expression="nilai &lt; batasMin">
+                <output expression="pesan" newline="True"/>
+                <input variable="nilai"/>
+                <if expression="nilai &lt; batasMin">
+                    <then>
+                        <output expression="&quot;error, nilai minimal adalah &quot; &amp; batasMin &amp; &quot;!&quot;" newline="True"/>
+                    </then>
+                    <else/>
+                </if>
+            </do>
+        </body>
+    </function>
+    <function name="bacaIntegerRentang" type="Integer" variable="nilai">
+        <parameters>
+            <parameter name="pesan" type="String" array="False"/>
+            <parameter name="batasMin" type="Integer" array="False"/>
+            <parameter name="batasMaks" type="Integer" array="False"/>
+        </parameters>
+        <body>
+            <declare name="nilai" type="Integer" array="False" size=""/>
+            <do expression="nilai &lt; batasMin or nilai &gt; batasMaks">
+                <output expression="pesan" newline="True"/>
+                <input variable="nilai"/>
+                <if expression="nilai &lt; batasMin or nilai &gt; batasMaks">
+                    <then>
+                        <output expression="&quot;error, nilai harus di rentang &quot; &amp; batasMin &amp; &quot; s.d. &quot; &amp; batasMaks &amp; &quot;!&quot;" newline="True"/>
+                    </then>
+                    <else/>
+                </if>
+            </do>
+        </body>
+    </function>
+    <function name="bacaRealRentang" type="Real" variable="nilai">
+        <parameters>
+            <parameter name="pesan" type="String" array="False"/>
+            <parameter name="batasMin" type="Real" array="False"/>
+            <parameter name="batasMaks" type="Real" array="False"/>
+        </parameters>
+        <body>
+            <declare name="nilai" type="Real" array="False" size=""/>
+            <do expression="nilai &lt; batasMin or nilai &gt; batasMaks">
+                <output expression="pesan" newline="True"/>
+                <input variable="nilai"/>
+                <if expression="nilai &lt; batasMin or nilai &gt; batasMaks">
+                    <then>
+                        <output expression="&quot;error, nilai harus di rentang &quot; &amp; batasMin &amp; &quot; s.d. &quot; &amp; batasMaks &amp; &quot;!&quot;" newline="True"/>
+                    </then>
+                    <else/>
+                </if>
+            </do>
+        </body>
+    </function>
+    <function name="bulatDua" type="Real" variable="hasil">
+        <parameters>
+            <parameter name="nilai" type="Real" array="False"/>
+        </parameters>
+        <body>
+            <declare name="hasil" type="Real" array="False" size=""/>
+            <assign variable="hasil" expression="Int(nilai*100)/100"/>
+        </body>
+    </function>
+    <function name="cetakKartuResume" type="None" variable="">
+        <parameters>
+            <parameter name="nomor" type="Integer" array="False"/>
+            <parameter name="nama" type="String" array="False"/>
+            <parameter name="bmi" type="Real" array="False"/>
+            <parameter name="kodeTensi" type="Integer" array="False"/>
+            <parameter name="gulaDarah" type="Real" array="False"/>
+            <parameter name="skor" type="Integer" array="False"/>
+            <parameter name="predikat" type="String" array="False"/>
+        </parameters>
+        <body>
+            <output expression="&quot;KARTU RESUME PASIEN &quot; &amp; nomor" newline="True"/>
+            <output expression="&quot;Nama : &quot; &amp; nama" newline="True"/>
+            <output expression="&quot;BMI : &quot; &amp; bulatDua(bmi)" newline="True"/>
+            <output expression="&quot;Tekanan Darah : &quot; &amp; namaKategoriTensi(kodeTensi) &amp; &quot; (kode &quot; &amp; kodeTensi &amp; &quot;)&quot;" newline="True"/>
+            <output expression="&quot;Gula Darah : &quot; &amp; gulaDarah &amp; &quot; mg/dL&quot;" newline="True"/>
+            <output expression="&quot;Skor Risiko  : &quot; &amp; skor" newline="True"/>
+            <output expression="&quot;Tindakan : &quot; &amp; predikat" newline="True"/>
+        </body>
+    </function>
+    <function name="cetakRingkasanKlinik" type="None" variable="">
+        <parameters>
+            <parameter name="jumlahPasien" type="Integer" array="False"/>
+            <parameter name="namaTertinggi" type="String" array="False"/>
+            <parameter name="skorTertinggi" type="Integer" array="False"/>
+            <parameter name="rataSkor" type="Real" array="False"/>
+        </parameters>
+        <body>
+            <output expression="&quot;RINGKASAN KLINIK&quot;" newline="True"/>
+            <output expression="&quot;jumlah pasien diperiksa : &quot; &amp; jumlahPasien" newline="True"/>
+            <output expression="&quot;pasien skor tertinggi : &quot; &amp; namaTertinggi &amp; &quot; (skor &quot; &amp; skorTertinggi &amp; &quot;)&quot;" newline="True"/>
+            <output expression="&quot;rata-rata skor klinik  : &quot; &amp; bulatDua(rataSkor)" newline="True"/>
+        </body>
+    </function>
+    <function name="hitungBMI" type="Real" variable="bmi">
+        <parameters>
+            <parameter name="beratKg" type="Real" array="False"/>
+            <parameter name="tinggiCm" type="Real" array="False"/>
+        </parameters>
+        <body>
+            <declare name="bmi" type="Real" array="False" size=""/>
+            <declare name="tinggiM" type="Real" array="False" size=""/>
+            <assign variable="tinggiM" expression="tinggiCm / 100"/>
+            <assign variable="bmi" expression="beratKg / (tinggiM * tinggiM)"/>
+        </body>
+    </function>
+    <function name="hitungSkorRisikoKomposit" type="Integer" variable="skor">
+        <parameters>
+            <parameter name="bmi" type="Real" array="False"/>
+            <parameter name="kodeTensi" type="Integer" array="False"/>
+            <parameter name="gulaDarah" type="Real" array="False"/>
+        </parameters>
+        <body>
+            <declare name="skor" type="Integer" array="False" size=""/>
+            <assign variable="skor" expression="0"/>
+            <if expression="bmi &gt;= 25">
+                <then>
+                    <assign variable="skor" expression="skor + 3"/>
+                </then>
+                <else>
+                    <if expression="bmi &lt; 18.5">
+                        <then>
+                            <assign variable="skor" expression="skor + 1"/>
+                        </then>
+                        <else/>
+                    </if>
+                </else>
+            </if>
+            <assign variable="skor" expression="skor + kodeTensi * 2"/>
+            <if expression="gulaDarah &gt;= 126">
+                <then>
+                    <assign variable="skor" expression="skor + 4"/>
+                </then>
+                <else>
+                    <if expression="gulaDarah &gt;= 100">
+                        <then>
+                            <assign variable="skor" expression="skor + 2"/>
+                        </then>
+                        <else/>
+                    </if>
+                </else>
+            </if>
+        </body>
+    </function>
+    <function name="kategoriTekananDarah" type="Integer" variable="kode">
+        <parameters>
+            <parameter name="sistolik" type="Integer" array="False"/>
+            <parameter name="diastolik" type="Integer" array="False"/>
+        </parameters>
+        <body>
+            <declare name="kode" type="Integer" array="False" size=""/>
+            <if expression="sistolik &gt;= 160 or diastolik &gt;= 100">
+                <then>
+                    <assign variable="kode" expression="3"/>
+                </then>
+                <else>
+                    <if expression="sistolik &gt;= 140 or diastolik &gt;= 90">
+                        <then>
+                            <assign variable="kode" expression="2"/>
+                        </then>
+                        <else>
+                            <if expression="sistolik &gt;= 120 or diastolik &gt;= 80">
+                                <then>
+                                    <assign variable="kode" expression="1"/>
+                                </then>
+                                <else>
+                                    <assign variable="kode" expression="0"/>
+                                </else>
+                            </if>
+                        </else>
+                    </if>
+                </else>
+            </if>
+        </body>
+    </function>
+    <function name="namaKategoriTensi" type="String" variable="label">
+        <parameters>
+            <parameter name="kode" type="Integer" array="False"/>
+        </parameters>
+        <body>
+            <declare name="label" type="String" array="False" size=""/>
+            <if expression="kode == 0">
+                <then>
+                    <assign variable="label" expression="&quot;normal&quot;"/>
+                </then>
+                <else>
+                    <if expression="kode == 1">
+                        <then>
+                            <assign variable="label" expression="&quot;pra-hipertensi&quot;"/>
+                        </then>
+                        <else>
+                            <if expression="kode == 2">
+                                <then>
+                                    <assign variable="label" expression="&quot;hipertensi tahap 1&quot;"/>
+                                </then>
+                                <else>
+                                    <assign variable="label" expression="&quot;hipertensi tahap 2&quot;"/>
+                                </else>
+                            </if>
+                        </else>
+                    </if>
+                </else>
+            </if>
+        </body>
+    </function>
+    <function name="predikatTindakanMedis" type="String" variable="hasil">
+        <parameters>
+            <parameter name="totalSkor" type="Integer" array="False"/>
+        </parameters>
+        <body>
+            <declare name="hasil" type="String" array="False" size=""/>
+            <if expression="totalSkor &gt;= 7">
+                <then>
+                    <assign variable="hasil" expression="&quot;RISIKO TINGGI: SEGERA RUJUK DOKTER SPESIALIS&quot;"/>
+                </then>
+                <else>
+                    <if expression="totalSkor &gt;= 4">
+                        <then>
+                            <assign variable="hasil" expression="&quot;RISIKO SEDANG: KONSULTASI GAYA HIDUP &amp; DIET&quot;"/>
+                        </then>
+                        <else>
+                            <assign variable="hasil" expression="&quot;STATUS PRIMA: KONDISI SEHAT&quot;"/>
+                        </else>
+                    </if>
+                </else>
+            </if>
+        </body>
+    </function>
+</flowgorithm>

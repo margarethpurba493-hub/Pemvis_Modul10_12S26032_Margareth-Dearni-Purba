@@ -1,0 +1,222 @@
+<?xml version="1.0"?>
+<flowgorithm fileversion="4.2">
+    <attributes>
+        <attribute name="name" value="Soal_04_SistemPOSRestoModular"/>
+        <attribute name="authors" value="marga"/>
+        <attribute name="about" value=""/>
+        <attribute name="saved" value="2026-11-15 01:14:11 AM"/>
+        <attribute name="created" value="bWFyZ2E7TUFSR0FSRVRIOzIwMjYtMTEtMTU7MTI6Mzk6MDcgQU07MjQ1Ng=="/>
+        <attribute name="edited" value="bWFyZ2E7TUFSR0FSRVRIOzIwMjYtMTEtMTU7MDE6MDI6NTMgQU07MTM7TWFoYXNpc3dhO1BDOzIwMjYtMTEtMTM7MTA6MDA6MDAgQU07U29hbF8wNF9TaXN0ZW1QT1NSZXN0b01vZHVsYXIuZnByZzs4MzI3"/>
+        <attribute name="edited" value="bWFyZ2E7TUFSR0FSRVRIOzIwMjYtMTEtMTU7MDE6MTQ6MTEgQU07MTsyNTUw"/>
+    </attributes>
+    <function name="Main" type="None" variable="">
+        <parameters/>
+        <body>
+            <declare name="namaMenu" type="String" array="True" size="4"/>
+            <declare name="hargaMenu" type="Real" array="True" size="4"/>
+            <declare name="jumMenu, pilihan, porsi" type="Integer" array="False" size=""/>
+            <declare name="totalBelanja, subtotal, pajak, diskonMember, totalTagihan" type="Real" array="False" size=""/>
+            <declare name="uangBayar, kembalian" type="Real" array="False" size=""/>
+            <declare name="isMember" type="Boolean" array="False" size=""/>
+            <assign variable="jumMenu" expression="4"/>
+            <assign variable="totalBelanja" expression="0"/>
+            <call expression="inisialisasiKatalog(namaMenu, hargaMenu)"/>
+            <call expression="tampilkanDaftarMenu(namaMenu, hargaMenu, jumMenu)"/>
+            <assign variable="pilihan" expression="bacaIntegerRentang(&quot;pilih nomor menu (1-4), ketik 0 untuk selesai:&quot;, 0, jumMenu)"/>
+            <while expression="pilihan != 0">
+                <assign variable="porsi" expression="bacaIntegerMin(&quot;jumlah porsi (minimal 1):&quot;, 1)"/>
+                <assign variable="subtotal" expression="hitungSubtotalItem(hargaMenu[pilihan - 1], porsi)"/>
+                <assign variable="totalBelanja" expression="totalBelanja + subtotal"/>
+                <output expression="&quot;ditambahkan: &quot; &amp; namaMenu[pilihan - 1] &amp; &quot; x&quot; &amp; porsi &amp; &quot; = Rp &quot; &amp; rupiah(subtotal)" newline="True"/>
+                <assign variable="pilihan" expression="bacaIntegerRentang(&quot;Pilih nomor menu (1-4), ketik 0 untuk selesai:&quot;, 0, jumMenu)"/>
+            </while>
+            <if expression="totalBelanja == 0">
+                <then>
+                    <output expression="&quot;tidak ada pesanan. Terima kasih!&quot;" newline="True"/>
+                </then>
+                <else>
+                    <assign variable="isMember" expression="bacaStatusMember()"/>
+                    <assign variable="pajak" expression="hitungPajakPB1(totalBelanja)"/>
+                    <assign variable="diskonMember" expression="hitungDiskonMember(totalBelanja, isMember)"/>
+                    <assign variable="totalTagihan" expression="rupiah(totalBelanja + pajak - diskonMember)"/>
+                    <call expression="cetakRincianTagihan(totalBelanja, pajak, diskonMember, totalTagihan)"/>
+                    <call expression="prosesPembayaranTunai(totalTagihan)"/>
+                </else>
+            </if>
+        </body>
+    </function>
+    <function name="bacaIntegerMin" type="Integer" variable="nilai">
+        <parameters>
+            <parameter name="pesan" type="String" array="False"/>
+            <parameter name="batasMin" type="Integer" array="False"/>
+        </parameters>
+        <body>
+            <declare name="nilai" type="Integer" array="False" size=""/>
+            <do expression="nilai &lt; batasMin">
+                <output expression="pesan" newline="True"/>
+                <input variable="nilai"/>
+                <if expression="nilai &lt; batasMin">
+                    <then>
+                        <output expression="&quot;error, nilai minimal adalah &quot; &amp; batasMin &amp; &quot;!&quot;" newline="True"/>
+                    </then>
+                    <else/>
+                </if>
+            </do>
+        </body>
+    </function>
+    <function name="bacaIntegerRentang" type="Integer" variable="nilai">
+        <parameters>
+            <parameter name="pesan" type="String" array="False"/>
+            <parameter name="batasMin" type="Integer" array="False"/>
+            <parameter name="batasMaks" type="Integer" array="False"/>
+        </parameters>
+        <body>
+            <declare name="nilai" type="Integer" array="False" size=""/>
+            <do expression="nilai &lt; batasMin or nilai &gt; batasMaks">
+                <output expression="pesan" newline="True"/>
+                <input variable="nilai"/>
+                <if expression="nilai &lt; batasMin or nilai &gt; batasMaks">
+                    <then>
+                        <output expression="&quot;error, nilai harus di rentang &quot; &amp; batasMin &amp; &quot; s.d. &quot; &amp; batasMaks &amp; &quot;!&quot;" newline="True"/>
+                    </then>
+                    <else/>
+                </if>
+            </do>
+        </body>
+    </function>
+    <function name="bacaStatusMember" type="Boolean" variable="hasil">
+        <parameters/>
+        <body>
+            <declare name="hasil" type="Boolean" array="False" size=""/>
+            <declare name="kode" type="Integer" array="False" size=""/>
+            <assign variable="kode" expression="bacaIntegerRentang(&quot;apakah pelanggan member? (1 = Ya, 0 = Tidak):&quot;, 0, 1)"/>
+            <assign variable="hasil" expression="kode == 1"/>
+        </body>
+    </function>
+    <function name="cetakRincianTagihan" type="None" variable="">
+        <parameters>
+            <parameter name="totalBelanja" type="Real" array="False"/>
+            <parameter name="pajak" type="Real" array="False"/>
+            <parameter name="diskonMember" type="Real" array="False"/>
+            <parameter name="totalTagihan" type="Real" array="False"/>
+        </parameters>
+        <body>
+            <output expression="&quot;RINCIAN TAGIHAN&quot;" newline="True"/>
+            <output expression="&quot;total belanja : Rp &quot; &amp; rupiah(totalBelanja)" newline="True"/>
+            <output expression="&quot;pajak PB1 (10%)  : Rp &quot; &amp; rupiah(pajak)" newline="True"/>
+            <output expression="&quot;diskon member : Rp &quot; &amp; rupiah(diskonMember)" newline="True"/>
+            <output expression="&quot;TOTAL TAGIHAN : Rp &quot; &amp; rupiah(totalTagihan)" newline="True"/>
+        </body>
+    </function>
+    <function name="hitungDiskonMember" type="Real" variable="diskon">
+        <parameters>
+            <parameter name="totalBelanja" type="Real" array="False"/>
+            <parameter name="isMember" type="Boolean" array="False"/>
+        </parameters>
+        <body>
+            <declare name="diskon" type="Real" array="False" size=""/>
+            <if expression="isMember == true and totalBelanja &gt;= 100000">
+                <then>
+                    <assign variable="diskon" expression="0.08 * totalBelanja"/>
+                </then>
+                <else>
+                    <assign variable="diskon" expression="0"/>
+                </else>
+            </if>
+        </body>
+    </function>
+    <function name="hitungPajakPB1" type="Real" variable="pajak">
+        <parameters>
+            <parameter name="totalKotor" type="Real" array="False"/>
+        </parameters>
+        <body>
+            <declare name="pajak" type="Real" array="False" size=""/>
+            <assign variable="pajak" expression="0.10 * totalKotor"/>
+        </body>
+    </function>
+    <function name="hitungSubtotalItem" type="Real" variable="subtotal">
+        <parameters>
+            <parameter name="hargaSatuan" type="Real" array="False"/>
+            <parameter name="porsi" type="Integer" array="False"/>
+        </parameters>
+        <body>
+            <declare name="subtotal" type="Real" array="False" size=""/>
+            <assign variable="subtotal" expression="hargaSatuan * porsi"/>
+            <if expression="porsi &gt;= 5">
+                <then>
+                    <assign variable="subtotal" expression="subtotal * 0.95"/>
+                    <output expression="&quot;  (diskon katering 5% diterapkan untuk item ini)&quot;" newline="True"/>
+                </then>
+                <else/>
+            </if>
+        </body>
+    </function>
+    <function name="inisialisasiKatalog" type="None" variable="">
+        <parameters>
+            <parameter name="nama" type="String" array="True"/>
+            <parameter name="harga" type="Real" array="True"/>
+        </parameters>
+        <body>
+            <assign variable="nama[0]" expression="&quot;naniura Raja&quot;"/>
+            <assign variable="harga[0]" expression="45000.0"/>
+            <assign variable="nama[1]" expression="&quot;arsik&quot;"/>
+            <assign variable="harga[1]" expression="40000.0"/>
+            <assign variable="nama[2]" expression="&quot;napinadar&quot;"/>
+            <assign variable="harga[2]" expression="38000.0"/>
+            <assign variable="nama[3]" expression="&quot;tipa-tipa &amp; kopi&quot;"/>
+            <assign variable="harga[3]" expression="22000.0"/>
+        </body>
+    </function>
+    <function name="prosesPembayaranTunai" type="None" variable="uangBayar, kembalian">
+        <parameters>
+            <parameter name="totalTagihanAkhir" type="Real" array="False"/>
+        </parameters>
+        <body>
+            <declare name="uangBayar, kembalian" type="Real" array="False" size=""/>
+            <do expression="uangBayar &lt; totalTagihanAkhir">
+                <output expression="&quot;masukkan uang tunai (Rp):&quot;" newline="True"/>
+                <input variable="uangBayar"/>
+                <if expression="uangBayar &lt; totalTagihanAkhir">
+                    <then>
+                        <output expression="&quot;kurang!, uang kurang Rp &quot; &amp; rupiah(totalTagihanAkhir - uangBayar) &amp; &quot;. silakan ulangi.&quot;" newline="True"/>
+                    </then>
+                    <else/>
+                </if>
+            </do>
+            <assign variable="kembalian" expression="uangBayar - totalTagihanAkhir"/>
+            <output expression="&quot;uang diterima : Rp &quot; &amp; rupiah(uangBayar)" newline="True"/>
+            <output expression="&quot;kembalian : Rp &quot; &amp; rupiah(kembalian)" newline="True"/>
+            <output expression="&quot;Terima kasih telah makan di Resto Khas Toba, Horas!&quot;" newline="True"/>
+        </body>
+    </function>
+    <function name="rupiah" type="Integer" variable="hasil">
+        <parameters>
+            <parameter name="nilai" type="Real" array="False"/>
+        </parameters>
+        <body>
+            <declare name="hasil" type="Integer" array="False" size=""/>
+            <if expression="nilai &gt;= 0">
+                <then>
+                    <assign variable="hasil" expression="Int(nilai + 0.5)"/>
+                </then>
+                <else>
+                    <assign variable="hasil" expression="Int(nilai - 0.5)"/>
+                </else>
+            </if>
+        </body>
+    </function>
+    <function name="tampilkanDaftarMenu" type="None" variable="">
+        <parameters>
+            <parameter name="nama" type="String" array="True"/>
+            <parameter name="harga" type="Real" array="True"/>
+            <parameter name="jum" type="Integer" array="False"/>
+        </parameters>
+        <body>
+            <declare name="i" type="Integer" array="False" size=""/>
+            <output expression="&quot;DAFTAR MENU RESTO KHAS TOBA =&quot;" newline="True"/>
+            <for variable="i" start="0" end="jum - 1" direction="inc" step="1">
+                <output expression="(i + 1) &amp; &quot;. &quot; &amp; nama[i] &amp; &quot; - Rp &quot; &amp; rupiah(harga[i])" newline="True"/>
+            </for>
+        </body>
+    </function>
+</flowgorithm>

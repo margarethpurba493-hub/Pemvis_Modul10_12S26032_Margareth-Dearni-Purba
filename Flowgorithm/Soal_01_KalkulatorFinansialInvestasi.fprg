@@ -1,0 +1,155 @@
+<?xml version="1.0"?>
+<flowgorithm fileversion="4.2">
+    <attributes>
+        <attribute name="name" value="Soal_01_KalkulatorFinansialInvestasi"/>
+        <attribute name="authors" value="marga"/>
+        <attribute name="about" value=""/>
+        <attribute name="saved" value="2026-11-14 11:00:15 PM"/>
+        <attribute name="created" value="bWFyZ2E7TUFSR0FSRVRIOzIwMjYtMTEtMTQ7MDk6MzY6MTUgUE07MjQ3Mg=="/>
+        <attribute name="edited" value="bWFyZ2E7TUFSR0FSRVRIOzIwMjYtMTEtMTQ7MTA6NTU6NDkgUE07NjtNYWhhc2lzd2E7UEM7MjAyNi0xMS0xMzsxMDowMDowMCBBTTtTb2FsXzAxX0thbGt1bGF0b3JGaW5hbnNpYWxJbnZlc3Rhc2kuZnByZzs5MTAy"/>
+        <attribute name="edited" value="bWFyZ2E7TUFSR0FSRVRIOzIwMjYtMTEtMTQ7MTE6MDA6MTUgUE07MTsyNTY0"/>
+    </attributes>
+    <function name="Main" type="None" variable="">
+        <parameters/>
+        <body>
+            <declare name="saldoAwal, setoran, target, biayaAdmin, saldoBerjalan, bunga, saldoAwalBln, saldoAkhirBln, totalSetor, totalBunga" type="Real" array="False" size=""/>
+            <declare name="n, bulan, bulanTercapai" type="Integer" array="False" size=""/>
+            <assign variable="biayaAdmin" expression="5000"/>
+            <assign variable="saldoAwal" expression="bacaRealMin (&quot;masukkan setoran rutin:&quot;, 0)"/>
+            <assign variable="setoran" expression="bacaRealMin (&quot;masukkan setoran rutin per bulan:&quot;, 0)"/>
+            <assign variable="n" expression="bacaIntegerMin (&quot;masukkan lama menabung n bulan(min 1) :&quot;,1)"/>
+            <assign variable="target" expression="bacaRealMin(&quot;masukkan target tabungan:&quot;, 0)"/>
+            <assign variable="saldoAwalBln" expression="saldoAwal"/>
+            <assign variable="totalSetor" expression="0"/>
+            <assign variable="totalBunga" expression="0"/>
+            <assign variable="bulanTercapai" expression="0"/>
+            <output expression="&quot;REKAPITULASI BULANAN&quot;" newline="True"/>
+            <for variable="bulan" start="1" end="n" direction="inc" step="1">
+                <assign variable="saldoBerjalan" expression="saldoAwalBln + setoran"/>
+                <assign variable="bunga" expression="hitungBungaBulanan(saldoBerjalan)"/>
+                <assign variable="saldoAkhirBln" expression="hitungSaldoAkhirBulan(saldoAwalBln, setoran, bunga, biayaAdmin)"/>
+                <call expression="cetakBarisBulan(bulan, saldoAwalBln, bunga, saldoAkhirBln)"/>
+                <assign variable="totalSetor" expression="totalSetor + setoran"/>
+                <assign variable="totalBunga" expression="totalBunga + bunga"/>
+                <if expression="bulanTercapai == 0 and saldoAkhirBln &gt;= target">
+                    <then>
+                        <assign variable="bulanTercapai" expression="bulan"/>
+                    </then>
+                    <else/>
+                </if>
+                <assign variable="saldoAwalBln" expression="saldoAkhirBln"/>
+            </for>
+            <call expression="cetakRangkumanFinansial(totalSetor, totalBunga, saldoAkhirBln, target, bulanTercapai)"/>
+        </body>
+    </function>
+    <function name="bacaIntegerMin" type="Integer" variable="nilai">
+        <parameters>
+            <parameter name="pesan" type="String" array="False"/>
+            <parameter name="batasMin" type="Integer" array="False"/>
+        </parameters>
+        <body>
+            <declare name="nilai" type="Integer" array="False" size=""/>
+            <do expression="nilai &lt; batasMin">
+                <output expression="pesan" newline="True"/>
+                <input variable="nilai"/>
+                <if expression="nilai &lt; batasMin">
+                    <then>
+                        <output expression="&quot;error, nilai minimal adalah &quot; &amp; batasMin &amp; &quot;!&quot;" newline="True"/>
+                    </then>
+                    <else/>
+                </if>
+            </do>
+        </body>
+    </function>
+    <function name="bacaRealMin" type="Real" variable="nilai">
+        <parameters>
+            <parameter name="pesan" type="String" array="False"/>
+            <parameter name="batasMin" type="Real" array="False"/>
+        </parameters>
+        <body>
+            <declare name="nilai" type="Real" array="False" size=""/>
+            <do expression="nilai &lt; batasMin">
+                <output expression="pesan" newline="True"/>
+                <input variable="nilai"/>
+                <if expression="nilai &lt; batasMin">
+                    <then>
+                        <output expression="&quot;error, nilai minimal adalah &quot; &amp; batasMin &amp; &quot;!&quot;" newline="True"/>
+                    </then>
+                    <else/>
+                </if>
+            </do>
+        </body>
+    </function>
+    <function name="cetakBarisBulan" type="None" variable="">
+        <parameters>
+            <parameter name="bulanKe" type="Integer" array="False"/>
+            <parameter name="saldoAwalBln" type="Real" array="False"/>
+            <parameter name="bunga" type="Real" array="False"/>
+            <parameter name="saldoAkhirBln" type="Integer" array="False"/>
+        </parameters>
+        <body>
+            <output expression="&quot;bulan &quot; &amp; bulanKe &amp; &quot; saldo Awal: Rp &quot; &amp; rupiah(saldoAwalBln) &amp; &quot; bunga: Rp &quot; &amp; rupiah(bunga) &amp; &quot; saldo akhir: Rp &quot; &amp; rupiah(saldoAkhirBln)" newline="True"/>
+        </body>
+    </function>
+    <function name="cetakRangkumanFinansial" type="None" variable="">
+        <parameters>
+            <parameter name="totalSetor" type="Real" array="False"/>
+            <parameter name="totalBunga" type="Real" array="False"/>
+            <parameter name="saldoFinal" type="Real" array="False"/>
+            <parameter name="target" type="Real" array="False"/>
+            <parameter name="bulanTercapai" type="Integer" array="False"/>
+        </parameters>
+        <body>
+            <output expression="&quot;RANGKUMAN FINANSIAL =&quot;" newline="True"/>
+            <output expression="&quot;total setoran mandiri : Rp &quot; &amp; rupiah(totalSetor)" newline="True"/>
+            <output expression="&quot;akumulasi bunga       : Rp &quot; &amp; rupiah(totalBunga)" newline="True"/>
+            <output expression="&quot;saldo akhir           : Rp &quot; &amp; rupiah(saldoFinal)" newline="True"/>
+            <output expression="&quot;target tabungan       : Rp &quot; &amp; rupiah(target)" newline="True"/>
+            <if expression="bulanTercapai &gt; 0">
+                <then>
+                    <output expression="&quot;analisis: TARGET TERCAPAI pada bulan ke-&quot; &amp; bulanTercapai" newline="True"/>
+                </then>
+                <else>
+                    <output expression="&quot;analisis: Target BELUM tercapai. kekurangan dana: Rp &quot; &amp; rupiah(target - saldoFinal)" newline="True"/>
+                </else>
+            </if>
+        </body>
+    </function>
+    <function name="hitungBungaBulanan" type="Real" variable="bunga">
+        <parameters>
+            <parameter name="saldoBerjalan" type="Real" array="False"/>
+        </parameters>
+        <body>
+            <declare name="bunga" type="Real" array="False" size=""/>
+            <if expression="saldoBerjalan &lt; 5000000">
+                <then>
+                    <assign variable="bunga" expression="0.003 * saldoBerjalan"/>
+                </then>
+                <else>
+                    <assign variable="bunga" expression="0.005 * saldoBerjalan"/>
+                </else>
+            </if>
+        </body>
+    </function>
+    <function name="hitungSaldoAkhirBulan" type="Real" variable="saldoAkhir">
+        <parameters>
+            <parameter name="saldoAwalBln" type="Real" array="False"/>
+            <parameter name="setoran" type="Real" array="False"/>
+            <parameter name="bunga" type="Real" array="False"/>
+            <parameter name="biayaAdmin" type="Real" array="False"/>
+        </parameters>
+        <body>
+            <declare name="saldoAkhir" type="Real" array="False" size=""/>
+            <assign variable="saldoAkhir" expression="saldoAwalBln + setoran + bunga - biayaAdmin"/>
+        </body>
+    </function>
+    <function name="rupiah" type="Integer" variable="hasil">
+        <parameters>
+            <parameter name="nilai" type="Real" array="False"/>
+        </parameters>
+        <body>
+            <declare name="hasil" type="Integer" array="False" size=""/>
+            <assign variable="hasil" expression="Int(nilai)"/>
+        </body>
+    </function>
+</flowgorithm>
